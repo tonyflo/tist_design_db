@@ -1,6 +1,8 @@
 ##### enumerations
 # page_type: 0=institution, 1=project, 2=lab, 3=profile, else=invalid
-# gender: 0=male, 1=female, else=invalid
+# gender: 0=male, else=female
+# verified: 0=false, else=true
+# permission_*: 0=false, else=true
 
 ##### static reference tables
 
@@ -71,6 +73,7 @@ create table PROJECT(
 	state_id int not null,
 	num_views int default 0 not null,
 	nickname varchar(25),
+	verified tinyint default 0 not null,
 	datetime_created timestamp not null,
 	datetime_updated timestamp,
 	primary key(project_id),
@@ -82,6 +85,7 @@ create table INSTITUTION(
 	institution_id int not null auto_increment,
 	institution_creator_id int not null,
 	name varchar(150) unique not null,
+	academia tinyint default 0 not null,
 	date_founded datetime not null,
 	picture_logo varchar(250) not null,
 	mission_statement text not null,
@@ -108,6 +112,10 @@ create table LAB(
 	location_id int not null,
 	num_views int default 0 not null,
 	nickname varchar(25),
+	verified tinyint default 0 not null,
+	permission_edit tinyint default 0 not null,
+	permission_appoint tinyint default 0 not null,
+	permission_approve tinyint default 0 not null,
 	datetime_created timestamp not null,
 	datetime_updated timestamp,
 	foreign key(institution_id) references INSTITUTION(institution_id),
@@ -120,7 +128,9 @@ create table LAB(
 create table CREDENTIALS(
 	user_id int not null,
 	email varchar(50) unique not null,
-	password varchar(60) not null,
+	password char(60) not null,
+	verified tinyint default 0 not null,
+	activation_code char(10),
 	datetime_updated timestamp,
 	foreign key(user_id) references USER(user_id)
 ) ENGINE=InnoDB;
@@ -136,6 +146,7 @@ create table ACADEMIC_CAREER(
 	discipline_id int not null,
 	datetime_created timestamp not null,
 	datetime_updated timestamp,
+	verified tinyint default 0 not null,
 	foreign key(institution_id) references INSTITUTION(institution_id),
 	foreign key(user_id) references USER(user_id),
 	foreign key(degree_id) referenced DEGREE(degree_id),
@@ -152,6 +163,7 @@ create table PROFESSIONAL_CAREER(
 	job_description text not null,
 	datetime_created timestamp not null,
 	datetime_updated timestamp,
+	verified tinyint default 0 not null,
 	foreign key(institution_id) references INSTITUTION(institution_id),
 	foreign key(user_id) references USER(user_id),
 	foreign key(job_title_id) referenced JOB_TITLE(job_title_id),
@@ -167,6 +179,10 @@ create table PROJECT_CONTRIBUTOR(
 	contribution_description text not null,
 	datetime_created timestamp not null,
 	datetime_updated timestamp,
+	verified tinyint default 0 not null,
+	permission_edit tinyint default 0 not null,
+	permission_appoint tinyint default 0 not null,
+	permission_approve tinyint default 0 not null,
 	foreign key(project_id) references PROJECT(project_id),
 	foreign key(user_id) references USER(user_id),
 	foreign key(discipline_id) referenced DISCIPLINE(discipline_id)
@@ -180,6 +196,10 @@ create table PROJECT_LAB(
 	description text not null,
 	datetime_created timestamp not null,
 	datetime_updated timestamp,
+	verified tinyint default 0 not null,
+	permission_edit tinyint default 0 not null,
+	permission_appoint tinyint default 0 not null,
+	permission_approve tinyint default 0 not null,
 	foreign key(project_id) references PROJECT(project_id),
 	foreign key(lab_id) references LAB(lab_id)
 ) ENGINE=InnoDB;
