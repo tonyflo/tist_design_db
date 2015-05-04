@@ -1,20 +1,24 @@
-##### enumerations
-# page_type: 0=institution, 1=project, 2=lab, 3=profile, else=invalid
-# gender: 0=male, else=female
-# verified: 0=false, else=true
-# permission_*: 0=false, else=true
-# public_*: 0=false, else=true
+-- @brief Database design definition for the tist website
 
-##### static reference tables
-#see discipline.sql for DISCIPLINE
+---------- enumerations
+-- page_type: 0=institution, 1=project, 2=lab, 3=profile, else=invalid
+-- gender: 0=male, else=female
+-- verified: 0=false, else=true
+-- permission_*: 0=false, else=true
+-- public_*: 0=false, else=true
 
-#TODO: import from UN/LOCODE (United Nations Code for Trade and Transport Locations) database
+---------- static reference tables
+--TODO: we must pre-populate all static reference tables
+
+--see discipline.sql for create table DISCIPLINE
+
+--TODO: import from UN/LOCODE (United Nations Code for Trade and Transport Locations) database
 create table LOCATION(
 	location_id int not null,
 	primary key(location_id)
 ) ENGINE=InnoDB;
 
-#EX: mr. mrs. dr. etc
+--EX: mr. ms. mrs. dr. etc
 create table TITLE(
 	title_id int not null auto_increment,
 	title varchar(5) unique not null,
@@ -33,7 +37,7 @@ create table DEGREE(
 	primary key(degree_id)
 ) ENGINE=InnoDB;
 
-#### independent tables
+-------- independent tables
 
 create table USER(
 	user_id int not null auto_increment,
@@ -46,7 +50,7 @@ create table USER(
 	primary key(user_id)
 ) ENGINE=InnoDB;
 
-#### main tables
+-------- main tables
 
 create table PROFILE(
 	user_id int not null,
@@ -129,7 +133,7 @@ create table LAB(
 	foreign key(lab_creator_id) references USER(user_id)
 ) ENGINE=InnoDB;
 
-#### supplementary "one to one" tables
+-------- supplementary "one to one" tables
 
 create table CREDENTIALS(
 	user_id int not null,
@@ -141,7 +145,7 @@ create table CREDENTIALS(
 	foreign key(user_id) references USER(user_id)
 ) ENGINE=InnoDB;
 
-#### supplementary "many to many" tables
+-------- supplementary "many to many" tables
 
 create table ACADEMIC_CAREER(
 	institution_id int not null,
@@ -211,7 +215,7 @@ create table PROJECT_CONTRIBUTOR_AT_LAB(
 	foreign key(discipline_id) references DISCIPLINE(discipline_id)
 ) ENGINE=InnoDB;
 
-#### supplementary "one to many" tables
+-------- supplementary "one to many" tables
 
 create table HISTORY(
 	history_id int not null auto_increment,
