@@ -50,6 +50,27 @@ create table USER(
 	primary key(user_id)
 ) ENGINE=InnoDB;
 
+create table PERMISSION(
+	permission_id int not null auto_increment,
+	verified tinyint default 0 not null,
+	verified_by_user_id int,
+	verified_datetime timestamp,
+	permission_edit tinyint default 0 not null,
+	permission_edit_granted_by_user_id int,
+	permission_edit_datetime timestamp,
+	permission_appoint tinyint default 0 not null,
+	permission_appoint_granted_by_user_id int,
+	permission_appoint_datetime timestamp,
+	permission_verify tinyint default 0 not null,
+	permission_verify_granted_by_user_id int,
+	permission_verify_datetime timestamp,
+	primary key(permission_id),
+	foreign key(verified_by_user_id) references USER(user_id),
+	foreign key(permission_edit_granted_by_user_id) references USER(user_id),
+	foreign key(permission_appoint_granted_by_user_id) references USER(user_id),
+	foreign key(permission_verify_granted_by_user_id) references USER(user_id)
+) ENGINE=InnoDB;
+
 -------- main tables
 
 create table PROFILE(
@@ -121,10 +142,6 @@ create table LAB(
 	location_id int not null,
 	num_views int default 0 not null,
 	nickname varchar(25),
-	verified tinyint default 0 not null,
-	permission_edit tinyint default 0 not null,
-	permission_appoint tinyint default 0 not null,
-	permission_verify tinyint default 0 not null,
 	datetime_created timestamp not null,
 	datetime_updated timestamp,
 	primary key(lab_id),
@@ -156,7 +173,6 @@ create table ACADEMIC_CAREER(
 	discipline_id int not null,
 	datetime_created timestamp not null,
 	datetime_updated timestamp,
-	verified tinyint default 0 not null,
 	foreign key(institution_id) references INSTITUTION(institution_id),
 	foreign key(user_id) references USER(user_id),
 	foreign key(degree_id) references DEGREE(degree_id),
@@ -171,12 +187,13 @@ create table PROFESSIONAL_CAREER(
 	discipline_id int not null,
 	job_title varchar(150) not null,
 	job_description text not null,
+	permission_id_for_institution int not null,
 	datetime_created timestamp not null,
 	datetime_updated timestamp,
-	verified tinyint default 0 not null,
 	foreign key(institution_id) references INSTITUTION(institution_id),
 	foreign key(user_id) references USER(user_id),
-	foreign key(discipline_id) references DISCIPLINE(discipline_id)
+	foreign key(discipline_id) references DISCIPLINE(discipline_id),
+	foreign key(permission_id_for_institution) references PERMISSION(permission_id)
 ) ENGINE=InnoDB;
 
 create table PROJECT_LAB(
@@ -188,9 +205,6 @@ create table PROJECT_LAB(
 	datetime_created timestamp not null,
 	datetime_updated timestamp,
 	verified tinyint default 0 not null,
-	permission_edit tinyint default 0 not null,
-	permission_appoint tinyint default 0 not null,
-	permission_verify tinyint default 0 not null,
 	foreign key(project_id) references PROJECT(project_id),
 	foreign key(lab_id) references LAB(lab_id)
 ) ENGINE=InnoDB;
@@ -203,16 +217,16 @@ create table PROJECT_CONTRIBUTOR_AT_LAB(
 	date_grad datetime not null,
 	discipline_id int not null,
 	contribution_description text not null,
+	permission_id_for_lab int not null,
+	permission_id_for_project int not null,
 	datetime_created timestamp not null,
 	datetime_updated timestamp,
-	verified tinyint default 0 not null,
-	permission_edit tinyint default 0 not null,
-	permission_appoint tinyint default 0 not null,
-	permission_verify tinyint default 0 not null,
 	foreign key(project_id) references PROJECT_LAB(project_id),
 	foreign key(lab_id) references PROJECT_LAB(lab_id),
 	foreign key(user_id) references USER(user_id),
-	foreign key(discipline_id) references DISCIPLINE(discipline_id)
+	foreign key(discipline_id) references DISCIPLINE(discipline_id),
+	foreign key(permission_id_for_lab) references PERMISSION(permission_id),
+	foreign key(permission_id_for_project) references PERMISSION(permission_id)
 ) ENGINE=InnoDB;
 
 -------- supplementary "one to many" tables
