@@ -139,7 +139,7 @@ create table CREDENTIALS(
 	user_id int not null,
 	email varchar(50) unique not null,
 	password char(60) not null,
-	verified_edu tinyint default 0 not null,
+	confirmed tinyint default 0 not null,
 	activation_code char(10),
 	datetime_updated timestamp,
 	foreign key(user_id) references USER(user_id)
