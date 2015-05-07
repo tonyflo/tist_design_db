@@ -165,7 +165,7 @@ create table CREDENTIALS(
 	email varchar(50) unique not null,
 	password char(60) not null,
 	confirmed tinyint default 0 not null,
-	activation_code char(10),
+	activation_code char(13),
 	datetime_updated timestamp,
 	foreign key(user_id) references USER(user_id)
 ) ENGINE=InnoDB;
