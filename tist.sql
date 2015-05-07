@@ -50,11 +50,18 @@ create table USER(
 	primary key(user_id)
 ) ENGINE=InnoDB;
 
-create table PERMISSION(
-	permission_id int not null auto_increment,
+create table VERIFIED(
+	verified_id int not null auto_increment,
 	verified tinyint default 0 not null,
 	verified_by_user_id int,
 	verified_datetime timestamp,
+	primary key(verified_id),
+	foreign key(verified_by_user_id) references USER(user_id)
+) ENGINE=InnoDB;
+
+create table PERMISSION(
+	permission_id int not null auto_increment,
+	verified_id int not null,
 	permission_edit tinyint default 0 not null,
 	permission_edit_granted_by_user_id int,
 	permission_edit_datetime timestamp,
@@ -65,7 +72,7 @@ create table PERMISSION(
 	permission_verify_granted_by_user_id int,
 	permission_verify_datetime timestamp,
 	primary key(permission_id),
-	foreign key(verified_by_user_id) references USER(user_id),
+	foreign key(verified_id) references VERIFIED(verified_id),
 	foreign key(permission_edit_granted_by_user_id) references USER(user_id),
 	foreign key(permission_appoint_granted_by_user_id) references USER(user_id),
 	foreign key(permission_verify_granted_by_user_id) references USER(user_id)
@@ -103,7 +110,6 @@ create table PROJECT(
 	state_id int not null,
 	num_views int default 0 not null,
 	nickname varchar(25),
-	verified tinyint default 0 not null,
 	datetime_created timestamp not null,
 	datetime_updated timestamp,
 	primary key(project_id),
@@ -144,7 +150,9 @@ create table LAB(
 	nickname varchar(25),
 	datetime_created timestamp not null,
 	datetime_updated timestamp,
+	verified_id int not null,
 	primary key(lab_id),
+	foreign key(verified_id) references VERIFIED(verified_id),
 	foreign key(institution_id) references INSTITUTION(institution_id),
 	foreign key(location_id) references LOCATION(location_id),
 	foreign key(lab_creator_id) references USER(user_id)
@@ -204,7 +212,8 @@ create table PROJECT_LAB(
 	description text not null,
 	datetime_created timestamp not null,
 	datetime_updated timestamp,
-	verified tinyint default 0 not null,
+	verified_id int not null,
+	foreign key(verified_id) references VERIFIED(verified_id),
 	foreign key(project_id) references PROJECT(project_id),
 	foreign key(lab_id) references LAB(lab_id)
 ) ENGINE=InnoDB;
