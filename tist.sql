@@ -172,38 +172,6 @@ create table CREDENTIALS(
 
 -------- supplementary "many to many" tables
 
-create table ACADEMIC_CAREER(
-	institution_id int not null,
-	user_id int not null,
-	date_start datetime not null,
-	date_grad datetime not null,
-	degree_id int not null,
-	discipline_id int not null,
-	datetime_created timestamp not null,
-	datetime_updated timestamp,
-	foreign key(institution_id) references INSTITUTION(institution_id),
-	foreign key(user_id) references USER(user_id),
-	foreign key(degree_id) references DEGREE(degree_id),
-	foreign key(discipline_id) references DISCIPLINE(discipline_id)
-) ENGINE=InnoDB;
-
-create table PROFESSIONAL_CAREER(
-	institution_id int not null,
-	user_id int not null,
-	date_start datetime not null,
-	date_grad datetime not null,
-	discipline_id int not null,
-	job_title varchar(150) not null,
-	job_description text not null,
-	permission_id_for_institution int not null,
-	datetime_created timestamp not null,
-	datetime_updated timestamp,
-	foreign key(institution_id) references INSTITUTION(institution_id),
-	foreign key(user_id) references USER(user_id),
-	foreign key(discipline_id) references DISCIPLINE(discipline_id),
-	foreign key(permission_id_for_institution) references PERMISSION(permission_id)
-) ENGINE=InnoDB;
-
 create table PROJECT_LAB(
 	project_id int not null,
 	lab_id int not null,
@@ -225,6 +193,7 @@ create table PROJECT_CONTRIBUTOR_AT_LAB(
 	date_start datetime not null,
 	date_grad datetime not null,
 	discipline_id int not null,
+	job_title varchar(150) not null,
 	contribution_description text not null,
 	permission_id_for_lab int not null,
 	permission_id_for_project int not null,
