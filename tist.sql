@@ -12,18 +12,13 @@
 
 --see discipline.sql for create table DISCIPLINE
 
---TODO: import from UN/LOCODE (United Nations Code for Trade and Transport Locations) database
-create table LOCATION(
-	location_id int not null,
-	primary key(location_id)
-) ENGINE=InnoDB;
-
 --EX: mr. ms. mrs. dr. etc
 create table TITLE(
 	title_id int not null auto_increment,
 	title varchar(5) unique not null,
 	primary key(title_id)
 ) ENGINE=InnoDB;
+insert into TITLE(title) values("Dr.", "Miss", "Mr.", "Mrs.", "Ms.", "Prof.");
 
 create table PROJECT_STATE(
 	state_id int not null auto_increment,
@@ -84,17 +79,13 @@ create table PROFILE(
 	user_id int not null,
 	bio text not null,
 	picture_profile varchar(250),
-	public_picture tinyint default 0 not null,
-	public_location tinyint default 0 not null,
 	title_id int,
-	location_id int not null,
 	num_views int default 0 not null,
 	nickname varchar(25),
 	datetime_created timestamp not null,
 	datetime_updated timestamp,
 	foreign key(user_id) references USER(user_id),
 	foreign key(title_id) references TITLE(title_id),
-	foreign key(location_id) references LOCATION(location_id)
 ) ENGINE=InnoDB;
 
 create table PROJECT(
@@ -119,21 +110,19 @@ create table PROJECT(
 
 create table INSTITUTION(
 	institution_id int not null auto_increment,
-	institution_creator_id int not null,
 	name varchar(150) unique not null,
-	academia tinyint default 0 not null,
-	date_founded datetime not null,
-	picture_logo varchar(250) not null,
-	mission_statement text not null,
 	link_website varchar(250),
-	location_id int not null,
-	num_views int default 0 not null,
-	nickname varchar(25),
-	datetime_created timestamp not null,
-	datetime_updated timestamp,
+	latitude varchar(25),
+	longiture varchar(25),
+	street_address varchar(255),
+	state_abbrev(2),
+	zip_code varchar(10),
+	city varchar(50),
+	date_founded datetime,
+	picture_logo varchar(250),
+	mission_statement text,
+	num_views int default 0,
 	primary key(institution_id),
-	foreign key(institution_creator_id) references USER(user_id),
-	foreign key(location_id) references LOCATION(location_id)
 ) ENGINE=InnoDB;
 
 create table LAB(
@@ -145,7 +134,6 @@ create table LAB(
 	picture_logo varchar(250) not null,
 	mission_statement text not null,
 	link_website varchar(250),
-	location_id int not null,
 	num_views int default 0 not null,
 	nickname varchar(25),
 	datetime_created timestamp not null,
@@ -154,7 +142,6 @@ create table LAB(
 	primary key(lab_id),
 	foreign key(verified_id) references VERIFIED(verified_id),
 	foreign key(institution_id) references INSTITUTION(institution_id),
-	foreign key(location_id) references LOCATION(location_id),
 	foreign key(lab_creator_id) references USER(user_id)
 ) ENGINE=InnoDB;
 
@@ -164,8 +151,6 @@ create table CREDENTIALS(
 	user_id int not null,
 	email varchar(50) unique not null,
 	password char(60) not null,
-	confirmed tinyint default 0 not null,
-	activation_code char(13),
 	datetime_updated timestamp,
 	foreign key(user_id) references USER(user_id)
 ) ENGINE=InnoDB;
@@ -173,38 +158,51 @@ create table CREDENTIALS(
 -------- supplementary "many to many" tables
 
 create table PROJECT_LAB(
+	project_lab_id int not null auto_increment,
 	project_id int not null,
 	lab_id int not null,
-	date_start datetime not null,
-	date_grad datetime not null,
-	description text not null,
 	datetime_created timestamp not null,
-	datetime_updated timestamp,
-	verified_id int not null,
-	foreign key(verified_id) references VERIFIED(verified_id),
+	primary key(project_lab_id),
 	foreign key(project_id) references PROJECT(project_id),
 	foreign key(lab_id) references LAB(lab_id)
 ) ENGINE=InnoDB;
 
-create table PROJECT_CONTRIBUTOR_AT_LAB(
-	project_id int not null,
-	lab_id int not null,
+create table INSTITUTION_MEMBER(
+	institution_member_id int not null auto_increment,
 	user_id int not null,
-	date_start datetime not null,
-	date_grad datetime not null,
+	institution_id int not null,
+	activation_code char(13),
+	confirmed tinyint default 0 not null,
+	datetime_created timestamp not null,
+	datetime_confirmed timestamp not null,
+	primary key(institution_member_id),
+	foreign key(user_id) references USER(user_id),
+	foreign key(institution_id) references INSTITUTION(institution_id)
+) ENGINE=InnoDB;
+
+create table LAB_MEMBER(
+	lab_member_id int not null auto_increment,
+	user_id int not null,
+	lab_id int not null,
+	datetime_created timestamp not null,
+	primary key(lab_member_id),
+	foreign key(user_id) references USER(user_id),
+	foreign key(lab_id) references LAB(lab_id)
+) ENGINE=InnoDB;
+
+create table PROJECT_MEMBER(
+	lab_member_id int not null,
+	project_lab_id int not null,
 	discipline_id int not null,
 	job_title varchar(150) not null,
 	contribution_description text not null,
-	permission_id_for_lab int not null,
-	permission_id_for_project int not null,
+	date_start datetime not null,
+	date_end datetime not null,
 	datetime_created timestamp not null,
 	datetime_updated timestamp,
-	foreign key(project_id) references PROJECT_LAB(project_id),
-	foreign key(lab_id) references PROJECT_LAB(lab_id),
-	foreign key(user_id) references USER(user_id),
 	foreign key(discipline_id) references DISCIPLINE(discipline_id),
-	foreign key(permission_id_for_lab) references PERMISSION(permission_id),
-	foreign key(permission_id_for_project) references PERMISSION(permission_id)
+	foreign key(project_lab_id) references PROJECT_LAB(project_lab_id),
+	foreign key(lab_member_id) references LAB_MEMBER(lab_member_id)
 ) ENGINE=InnoDB;
 
 -------- supplementary "one to many" tables
